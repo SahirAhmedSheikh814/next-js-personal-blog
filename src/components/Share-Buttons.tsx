@@ -10,7 +10,7 @@ interface ShareButtonsProps {
   socialLinks: Array<{ platform: string; url: string }>;
 }
 
-export function ShareButtons({ title, slug, socialLinks }: ShareButtonsProps) {
+export function ShareButtons({slug, socialLinks }: ShareButtonsProps) {
   const shareUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/blog/${slug}`;
 
   const handleCopyLink = () => {

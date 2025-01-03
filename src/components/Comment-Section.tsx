@@ -12,7 +12,7 @@ interface Comment {
   createdAt: Date;
 }
 
-export function CommentSection({ postSlug }: { postSlug: string }) {
+export function CommentSection({ }: { postSlug: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
