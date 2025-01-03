@@ -5,13 +5,27 @@ import { groq } from "next-sanity";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import SectionHeading from "@/components/Helper/SectionHeading";
+import { TypedObject } from "@portabletext/types";
+
+interface AboutMeData {
+  name: string;
+  bio: string;
+  profileImage: string;
+  introduction: TypedObject | TypedObject[];
+  skills: string[];
+  socialLinks: Array<{
+    platform: string;
+    url: string;
+  }>;
+  hobbies: string[];
+}
 
 const socialIcons = {
   github: FaGithub,
   facebook: FaFacebook,
   linkedin: FaLinkedin,
   instagram: FaInstagram,
-};
+} as const;
 
 export default async function AboutMeContent() {
   const query = groq`
@@ -28,15 +42,8 @@ export default async function AboutMeContent() {
       hobbies
     }
   `;
-  const about: {
-    name: string;
-    bio: string;
-    profileImage: string;
-    introduction: any;
-    skills: string[];
-    socialLinks: { platform: string; url: string }[];
-    hobbies: string[];
-  } = await client.fetch(query);
+  
+  const about: AboutMeData = await client.fetch(query);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white">
@@ -45,10 +52,11 @@ export default async function AboutMeContent() {
           <div className="text-center mb-8">
             <Image
               src={urlFor(about.profileImage).url()}
-              alt={`Background Image`}
+              alt={`${about.name}'s Profile`}
               width={200}
               height={200}
               className="rounded-full mx-auto mb-4"
+              priority
             />
             <h1 className="text-3xl font-bold mb-2">{about.name}</h1>
             <p className="text-xl text-gray-600">{about.bio}</p>
@@ -81,18 +89,16 @@ export default async function AboutMeContent() {
             <h2 className="text-2xl font-semibold mb-4">Connect with Me</h2>
             <div className="flex gap-4">
               {about.socialLinks.map((link, index) => {
-                const platform =
-                  link.platform.toLowerCase() as keyof typeof socialIcons;
+                const platform = link.platform.toLowerCase() as keyof typeof socialIcons;
                 const Icon = socialIcons[platform];
-                const hoverClass =
-                  platform === "instagram"
-                    ? "hover:text-red-500"
-                    : platform === "github"
-                      ? "hover:text-gray-800"
-                      : platform === "facebook" || platform === "linkedin"
-                        ? "hover:text-blue-500"
-                        : "hover:text-gray-600"; // Default hover color
-                return (
+                const hoverClass = {
+                  instagram: "hover:text-red-500",
+                  github: "hover:text-gray-800",
+                  facebook: "hover:text-blue-500",
+                  linkedin: "hover:text-blue-500"
+                }[platform] || "hover:text-gray-600";
+
+                return Icon ? (
                   <a
                     key={index}
                     href={link.url}
@@ -100,9 +106,9 @@ export default async function AboutMeContent() {
                     rel="noopener noreferrer"
                     className={`text-gray-600 transition-colors ${hoverClass}`}
                   >
-                    {Icon && <Icon size={24} />}
+                    <Icon size={24} />
                   </a>
-                );
+                ) : null;
               })}
             </div>
           </div>

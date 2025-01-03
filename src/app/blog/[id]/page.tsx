@@ -1,3 +1,4 @@
+import React from "react";
 import { groq } from "next-sanity";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
@@ -6,18 +7,86 @@ import { PortableText } from "@portabletext/react";
 import { CommentSection } from "@/components/Comment-Section";
 import { Newsletter } from "@/components/Newsletter";
 import { RelatedPosts } from "@/components/RelatedPosts";
-import { Share2 } from "lucide-react";
-import { FaGithub, FaLinkedin, FaFacebook, FaInstagram } from "react-icons/fa";
+import { Share2, Github, Linkedin, Facebook, Instagram } from "lucide-react";
+import { TypedObject } from "@portabletext/types";
 
+interface BlogPost {
+  title: string;
+  id: string;
+  author: string;
+  date: string;
+  image: string;
+  tags: string[];
+  description: string;
+  content: TypedObject | TypedObject[];
+  shares: number;
+  relatedPosts: RelatedPost[];
+}
+
+interface RelatedPost {
+  title: string;
+  id: string;
+  image: string;
+  shares: number;
+  ctaText: string;
+}
+
+interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+interface BlogPostResponse {
+  post: BlogPost;
+  socialLinks: SocialLink[];
+}
+
+// Social Icons Configuration
 const socialIcons = {
-  github: FaGithub,
-  linkedin: FaLinkedin,
-  facebook: FaFacebook,
-  instagram: FaInstagram,
+  github: Github,
+  facebook: Facebook,
+  linkedin: Linkedin,
+  instagram: Instagram,
+} as const;
+
+type SocialPlatform = keyof typeof socialIcons;
+type HoverClassMap = Record<SocialPlatform, string>;
+
+const hoverClassMap: HoverClassMap = {
+  instagram: "hover:text-red-500",
+  github: "hover:text-gray-800",
+  facebook: "hover:text-blue-500",
+  linkedin: "hover:text-blue-500",
 };
 
-// Fetch single blog post and social links
-async function getBlogPost(id: string) {
+// Social Links Component
+function SocialLinks({ links }: { links: SocialLink[] }) {
+  return (
+    <div className="flex gap-4 mb-8">
+      {links.map((link, index) => {
+        const platform = link.platform.toLowerCase() as SocialPlatform;
+        const Icon = socialIcons[platform];
+        const hoverClass = hoverClassMap[platform] || "hover:text-gray-600";
+
+        return Icon ? (
+          <a
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`text-gray-600 transition-colors ${hoverClass}`}
+            aria-label={`Visit our ${platform} page`}
+          >
+            <Icon size={24} />
+          </a>
+        ) : null;
+      })}
+    </div>
+  );
+}
+
+// Fetch blog post data
+async function getBlogPost(id: string): Promise<BlogPostResponse> {
   return await client.fetch(
     groq`{
       "post": *[_type == "blogPost" && id == $id][0]{
@@ -45,11 +114,7 @@ async function getBlogPost(id: string) {
 }
 
 export default async function BlogPost({ params }: { params: { id: string } }) {
-  const {
-    post,
-    socialLinks,
-  }: { post: any; socialLinks: { platform: string; url: string }[] } =
-    await getBlogPost(params.id);
+  const { post, socialLinks } = await getBlogPost(params.id);
 
   if (!post) {
     return (
@@ -61,24 +126,22 @@ export default async function BlogPost({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
-        <Image
-          src={urlFor(post.image).url()}
-          alt="Hero section Background"
-          width={1200} // Define a width for the image (adjust as needed)
-          height={800} // Define the height based on the aspect ratio you want (adjust as needed)
-          style={{
-            objectFit: "cover",
-            filter: "brightness(0.7)",
-            width: "100%",
-            height: "100%",
-          }}
-          quality={100}
-          priority
-          fetchPriority="high"
-        />
-        {/* Centered Content */}
+        <div className="relative w-full h-[100vh]">
+          <Image
+            src={urlFor(post.image).url()}
+            alt={post.title}
+            fill
+            style={{
+              objectFit: "cover", // Ensures the image covers the container
+              filter: "brightness(0.7)",
+            }}
+            quality={100}
+            priority
+            fetchPriority="high"
+          />
+        </div>
+
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-2 max-w-7xl mx-auto drop-shadow-lg">
           <div className="text-center mt-30">
             <h1 className="text-2xl sm:text-4xl md:text-6xl leading-[84px] font-bold text-[64px] tracking-[0.5px] text-white mb-4 drop-shadow-lg max-w-6xl">
@@ -100,7 +163,6 @@ export default async function BlogPost({ params }: { params: { id: string } }) {
       </div>
 
       <article className="max-w-5xl mx-auto px-4 py-8">
-        {/* Post Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
           <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
@@ -117,38 +179,11 @@ export default async function BlogPost({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        <div className="flex gap-4 mb-8 ">
-          {socialLinks.map((link, index) => {
-            const platform =
-              link.platform.toLowerCase() as keyof typeof socialIcons;
-            const Icon = socialIcons[platform];
-            const hoverClass =
-              platform === "instagram"
-                ? "hover:text-red-500"
-                : platform === "github"
-                  ? "hover:text-gray-800"
-                  : platform === "facebook" || platform === "linkedin"
-                    ? "hover:text-blue-500"
-                    : "hover:text-gray-600"; // Default hover color
-            return (
-              <a
-                key={index}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-gray-600 transition-colors ${hoverClass}`}
-                aria-label={`Visit our ${platform} page`}
-              >
-                {Icon && <Icon size={24} />}
-              </a>
-            );
-          })}
-        </div>
+        <SocialLinks links={socialLinks} />
 
-        {/* Tags */}
         {post.tags && (
           <div className="flex gap-2 mb-8">
-            {post.tags.map((tag: string) => (
+            {post.tags.map((tag) => (
               <span
                 key={tag}
                 className="px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-400 cursor-pointer rounded-full text-sm"
@@ -159,18 +194,12 @@ export default async function BlogPost({ params }: { params: { id: string } }) {
           </div>
         )}
 
-        {/* Post Content */}
         <div className="prose dark:prose-invert max-w-none mb-12">
           <PortableText value={post.content} />
         </div>
 
-        {/* Comments Section */}
         <CommentSection postSlug={params.id} />
-
-        {/* Newsletter */}
         <Newsletter />
-
-        {/* Related Posts */}
         <RelatedPosts posts={post.relatedPosts} />
       </article>
     </div>

@@ -2,11 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
+// Define a custom type for Sanity images
+interface SanityImageSource {
+  _type: string;
+  asset: {
+    _ref: string;
+    _type: string;
+  };
+}
+
+// Define the interface for related posts
 interface RelatedPost {
   title: string;
   id: string;
-  image: any;
-  shares: string;
+  image: string | SanityImageSource; // Accept both string and SanityImageSource
+  shares: number;
   ctaText: string;
 }
 
@@ -19,7 +29,7 @@ export function RelatedPosts({ posts }: { posts: RelatedPost[] }) {
           <Link key={post.id} href={`/blog/${post.id}`} className="group">
             <div className="relative aspect-video mb-4">
               <Image
-                src={urlFor(post.image).url()}
+                src={typeof post.image === "string" ? post.image : urlFor(post.image).url()}
                 alt={post.title}
                 fill
                 className="object-cover rounded-lg group-hover:opacity-90 transition-opacity"

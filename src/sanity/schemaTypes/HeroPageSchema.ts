@@ -1,6 +1,6 @@
 import { Rule } from '@sanity/types';
 
-export default {
+const heroPageSchema = {
   name: 'heroPage',
   title: 'Hero Page',
   type: 'document',
@@ -34,3 +34,5 @@ export default {
     },
   ],
 };
+
+export default heroPageSchema;

@@ -1,6 +1,7 @@
 import { defineArrayMember } from "sanity";
+import { Rule } from "sanity";
 
-export default {
+const blogPostSchema = {
   name: 'blogPost',
   title: 'Blog Post',
   type: 'document',
@@ -43,8 +44,7 @@ export default {
       type: 'array',
       of: [{ type: 'string' }],
       description: 'Tags for categorizing the blog post',
-      validation: (Rule: any) => 
-        Rule.max(11).error()
+      validation: (Rule: Rule) => Rule.max(11).error('Too many tags. Maximum is 11.'),
     },
     {
       name: 'description',
@@ -76,3 +76,5 @@ export default {
     },
   ],
 };
+
+export default blogPostSchema;

@@ -1,4 +1,3 @@
-
 import { groq } from "next-sanity";
 import { client } from "@/sanity/lib/client";
 import ContactForm from "@/components/Contact-form";
@@ -33,7 +32,7 @@ export default async function ContactPage() {
           <SectionHeading>Get in Touch</SectionHeading>
         </div>
         <p className="text-xl text-center mt-12 mb-12 text-gray-600">
-          We'd love to hear from you. Send us a message and we'll respond as
+          We&apos;d love to hear from you. Send us a message and we&apos;ll respond as
           soon as possible.
         </p>
 
@@ -73,10 +72,10 @@ export default async function ContactPage() {
                     platform === "instagram"
                       ? "hover:text-red-500"
                       : platform === "github"
-                        ? "hover:text-gray-800"
-                        : platform === "facebook" || platform === "linkedin"
-                          ? "hover:text-blue-500"
-                          : "hover:text-gray-600"; // Default hover color
+                      ? "hover:text-gray-800"
+                      : platform === "facebook" || platform === "linkedin"
+                      ? "hover:text-blue-500"
+                      : "hover:text-gray-600"; // Default hover color
 
                   return (
                     <a
