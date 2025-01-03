@@ -5,7 +5,8 @@ import AuthorSchema from './AuthorSchema'
 import AboutPageSchema from './AboutPageSchema'
 import BlockContent from './BlockContent'
 import FaqPageSchema from './FaqPageSchema'
+import navbarLogoSchema from './NavbarLogoSchema'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [HeroPageSchema,BlogPageSchema,AuthorSchema,BlockContent,AboutPageSchema,FaqPageSchema],
+  types: [HeroPageSchema,BlogPageSchema,AuthorSchema,BlockContent,AboutPageSchema,FaqPageSchema,navbarLogoSchema],
 }

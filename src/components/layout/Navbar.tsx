@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +20,19 @@ import {
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+   const [logo, setLogo] = React.useState(null); // Store logo data
   const pathname = usePathname();
+
+   // Fetch the logo image from Sanity
+   React.useEffect(() => {
+    const fetchLogo = async () => {
+      const query = '*[_type == "navbarLogo"][0]'; // Query for the logo image
+      const logoData = await client.fetch(query);
+      setLogo(logoData?.logo); // Set the logo image in state
+    };
+
+    fetchLogo();
+  }, []);
 
   const blackBackgroundPages = ["/about", "/contact", "/faq"];
   const shouldBeBlack = blackBackgroundPages.includes(pathname);
@@ -58,17 +72,19 @@ export default function Navbar() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Image
-              src="/Group 237604.svg"
-              alt="Logo"
-              width={220}
-              height={60}
-              className="w-[180px] h-auto md:w-[220px] xl:w-[240px]"
-              style={{ height: "auto" }}
-              priority
-            />
+            {/* Use Sanity logo */}
+            {logo && (
+              <Image
+                src={urlFor(logo).url()} // Use the urlFor method to get the image URL
+                alt="Logo"
+                width={220}
+                height={60}
+                className="w-[180px] h-auto md:w-[220px] xl:w-[240px]"
+                style={{ height: "auto" }}
+                priority
+              />
+            )}
           </div>
-
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex items-center space-x-8">
             {[

@@ -1,7 +1,5 @@
-
-
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router'; // Correct import
 
 export default function NotFoundPage() {
   const router = useRouter();
@@ -9,8 +7,8 @@ export default function NotFoundPage() {
   // Redirect to the homepage or any other fallback page after a certain time
   useEffect(() => {
     setTimeout(() => {
-      router.push('/');
-    }, 5000); // Redirect after 5 seconds
+      router.push('/'); // Redirect after 5 seconds
+    }, 5000);
   }, [router]);
 
   return (
