@@ -229,20 +229,28 @@ export default function Navbar() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            {logo ? (
-              <Image
-                src={urlFor(logo).url()}
-                alt="Logo"
-                width={140}
-                height={40}
-                className="w-[180px] h-auto md:w-[220px] xl:w-[240px]"
-                style={{ height: "auto" }}
-                priority
-              />
-            ) : (
-              <p>Loading</p>
-            )}
-          </div>
+          {logo ? (
+  <Image
+    src={urlFor(logo).url()}
+    alt="Logo"
+    width={140}
+    height={40}
+    className="w-[180px] h-auto md:w-[220px] xl:w-[240px]"
+    style={{ height: "auto" }}
+    priority
+  />
+) : (
+  <Image
+    src="public/Group 237604.svg"  
+    alt="Fallback Logo"
+    width={140}
+    height={40}
+    className="w-[180px] h-auto md:w-[220px] xl:w-[240px]"
+    style={{ height: "auto" }}
+    priority
+  />
+)}
+</div>
 
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex items-center space-x-8">
